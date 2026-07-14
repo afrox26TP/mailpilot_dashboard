@@ -71,6 +71,15 @@ Pro veřejné nasazení vždy nastavte `APP_USERNAME` a silné náhodné `APP_PA
 
 ## Cloudflare Tunnel
 
+### Aktuální nasazení
+
+- URL: **https://mailpilot.autoidx.cz**
+- uživatelské jméno: `admin`
+- heslo: hodnota `APP_PASSWORD` v lokálním souboru `.env`
+- cílová služba tunelu: `http://127.0.0.1:5000`
+
+Skutečné heslo není z bezpečnostních důvodů uloženo v README ani v repozitáři. Změníte ho úpravou `APP_PASSWORD` v `.env` a restartováním backendu. Přístupové údaje ukládejte do správce hesel.
+
 Po sestavení frontendu lze celou Flask aplikaci zveřejnit tunelem směrovaným na `http://127.0.0.1:5000`. Příklad samostatné konfigurace:
 
         tunnel: ID_TUNELU

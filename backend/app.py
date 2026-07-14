@@ -1,10 +1,11 @@
 import os
 import re
+import secrets
 from pathlib import Path
 
 import mailchimp_marketing as MailchimpMarketing
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, Response, jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -18,6 +19,28 @@ CORS(app, resources={r"/api/*": {"origins": os.getenv("FRONTEND_ORIGIN", "http:/
 limiter = Limiter(get_remote_address, app=app, default_limits=["120 per minute"], storage_uri="memory://")
 
 EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+
+
+@app.before_request
+def require_authentication():
+    username = os.getenv("APP_USERNAME", "").strip()
+    password = os.getenv("APP_PASSWORD", "")
+    if app.testing or not username or not password:
+        return None
+
+    auth = request.authorization
+    valid = (
+        auth is not None
+        and secrets.compare_digest(auth.username or "", username)
+        and secrets.compare_digest(auth.password or "", password)
+    )
+    if valid:
+        return None
+    return Response(
+        "Přihlášení je vyžadováno.",
+        401,
+        {"WWW-Authenticate": 'Basic realm="MailPilot", charset="UTF-8"'},
+    )
 
 
 def mailchimp_client():

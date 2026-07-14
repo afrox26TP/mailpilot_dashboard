@@ -66,3 +66,18 @@ Po sestavení frontend obslouží přímo Flask na portu 5000. Pro produkci nast
 ## Bezpečnost odesílání
 
 Ostré rozeslání vyžaduje potvrzovací dialog a backend navíc kontroluje hodnotu `ODESLAT`. Opakované požadavky jsou omezené. Pokud Mailchimp kampaň odmítne, rozhraní zobrazí detail jeho chyby (např. neověřený odesílatel nebo chybějící fyzická adresa).
+
+Pro veřejné nasazení vždy nastavte `APP_USERNAME` a silné náhodné `APP_PASSWORD`. Backend potom chrání frontend i všechny API endpointy HTTP Basic přihlášením. Doporučenou další vrstvou je Cloudflare Access omezený na konkrétní uživatelský e-mail.
+
+## Cloudflare Tunnel
+
+Po sestavení frontendu lze celou Flask aplikaci zveřejnit tunelem směrovaným na `http://127.0.0.1:5000`. Příklad samostatné konfigurace:
+
+        tunnel: ID_TUNELU
+        credentials-file: C:\Users\uzivatel\.cloudflared\ID_TUNELU.json
+        ingress:
+            - hostname: mailpilot.example.cz
+                service: http://127.0.0.1:5000
+            - service: http_status:404
+
+Soubor s credentials ani `.env` nikdy neukládejte do repozitáře.

@@ -18,6 +18,17 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.get_json()["ok"])
 
+    def test_basic_auth_protects_public_app(self):
+        app.config["TESTING"] = False
+        with patch.dict(os.environ, {"APP_USERNAME": "admin", "APP_PASSWORD": "secret"}):
+            unauthorized = self.client.get("/api/health")
+            authorized = self.client.get(
+                "/api/health", headers={"Authorization": "Basic YWRtaW46c2VjcmV0"}
+            )
+        app.config["TESTING"] = True
+        self.assertEqual(unauthorized.status_code, 401)
+        self.assertEqual(authorized.status_code, 200)
+
     def test_live_send_requires_confirmation(self):
         response = self.client.post("/api/campaigns/send", json={})
         self.assertEqual(response.status_code, 400)

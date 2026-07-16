@@ -90,3 +90,23 @@ Po sestavení frontendu lze celou Flask aplikaci zveřejnit tunelem směrovaným
             - service: http_status:404
 
 Soubor s credentials ani `.env` nikdy neukládejte do repozitáře.
+
+### Automatický watchdog na Windows
+
+Watchdog kontroluje lokální backend i veřejný endpoint, po třech neúspěšných
+kontrolách restartuje příslušnou službu a po přihlášení do Windows se spustí
+automaticky přes uživatelský autostart. Nadřazený supervisor znovu spustí také
+samotný watchdog, pokud by neočekávaně skončil. Instalace pro aktuálního uživatele:
+
+    powershell -ExecutionPolicy Bypass -File .\scripts\install-watchdog.ps1
+
+Stav watchdogu je v `logs\watchdog.log` a stav supervisoru v
+`logs\supervisor.log`. Výstupy jednotlivých spuštění backendu a tunelu jsou ve
+stejné složce. Odinstalace automatického spouštění:
+
+    powershell -ExecutionPolicy Bypass -File .\scripts\install-watchdog.ps1 -Uninstall
+
+Watchdog očekává virtuální prostředí `.venv`, konfiguraci tunelu v
+`%USERPROFILE%\.cloudflared\mailpilot.yml` a `cloudflared.exe` v
+`%LOCALAPPDATA%\Cloudflare` nebo v systémové cestě `PATH`. Přihlašovací údaje ani
+credentials tunelu nekopíruje a neloguje.
